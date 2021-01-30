@@ -14,14 +14,14 @@ import {
 // import AuthControl from '../../utils/AuthControl';
 import {Formik, Field} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import LoginValidationSchema from '../../schema/LoginValidation';
+import RegisterValidationSchema from '../../schema/RegisterValidation';
 import {calcHeight, calcWidth} from '../../settings/dimensions';
 import {
   CustomLoginInput,
   CustomPasswordInput,
   SafeStatusView,
 } from '../../components';
-class LoginScreen extends Component {
+class RegisterScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -72,14 +72,32 @@ class LoginScreen extends Component {
             <Text style={styles.welcomeText}>Hoşgeldiniz</Text>
             <Formik
               validateOnMount={true}
-              validationSchema={LoginValidationSchema}
+              validationSchema={RegisterValidationSchema}
               initialValues={{
+                name: '',
+                surName: '',
                 email: '',
                 password: '',
               }}
               onSubmit={this._handleSubmit}>
               {({handleSubmit, isValid}) => (
                 <>
+                  <View style={styles.inputViewStyle}>
+                    <Field
+                      component={CustomLoginInput}
+                      name="name"
+                      placeholder="İsim"
+                      placeholderTextColor="#8E9092"
+                    />
+                  </View>
+                  <View style={styles.inputViewStyle}>
+                    <Field
+                      component={CustomLoginInput}
+                      name="surName"
+                      placeholder="Soyisim"
+                      placeholderTextColor="#8E9092"
+                    />
+                  </View>
                   <View style={styles.inputViewStyle}>
                     <Field
                       component={CustomLoginInput}
@@ -114,10 +132,12 @@ class LoginScreen extends Component {
                           }
                           disabled={!isValid}
                           onPress={handleSubmit}>
-                          <Text style={styles.ButtonText}>GİRİŞ YAP</Text>
+                          <Text style={styles.ButtonText}>KAYIT OL</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.goSignup}>
-                          <Text>Hesabın yok mu ? O halde kayıt ol.</Text>
+                          <Text>
+                            Zaten bir hesabın var mı ? O halde Giriş Yap
+                          </Text>
                         </TouchableOpacity>
                       </>
                     )}
@@ -227,5 +247,5 @@ const styles = StyleSheet.create({
 //   SignIn,
 // };
 //
-// LoginScreen = connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
-export default LoginScreen;
+// RegisterScreen = connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
+export default RegisterScreen;
