@@ -15,15 +15,15 @@ const Router = () => (
     screenOptions={{
       headerShown: false,
     }}>
-    <RouteStack.Screen name="Loading" component={RegisterScreen} />
-    <RouteStack.Screen name="Login" component={LoginScreen} />
+    {/*<RouteStack.Screen name="Loading" component={RegisterScreen} />*/}
+    {/*<RouteStack.Screen name="Login" component={LoginScreen} />*/}
     <RouteStack.Screen name="Bottom" component={BottomTabNav} />
   </RouteStack.Navigator>
 );
 
 const BottomTabNav = () => (
   <BottomTab.Navigator
-    initialRouteName="Post"
+    initialRouteName="HomeScreen"
     activeColor="#f0edf6"
     inactiveColor="#3e2465"
     barStyle={{backgroundColor: '#694fad'}}
