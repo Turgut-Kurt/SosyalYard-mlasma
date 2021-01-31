@@ -9,40 +9,51 @@ class CustomPost extends Component {
     this.state = {};
   }
   render() {
+    const {
+      id,
+      first_name,
+      last_name,
+      profilePicture,
+      postDescription,
+      postCreatedAt,
+      postLiked,
+      postComment,
+      postImage,
+    } = this.props;
+    console.log('profilePicture');
+    console.log(profilePicture);
+    console.log('profilePicture');
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
           <TouchableOpacity
             style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
             <Image
-              source={require('../../assets/denemeprofil.jpg')}
+              source={{uri: profilePicture}}
               style={styles.imageProfileStyle}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.postHeaderCenter}>
-            <Text style={styles.postHeaderCenterTopText}>Carly Jane</Text>
-            <Text style={styles.postHeaderCenterBottomText}>Carly Jane</Text>
+            <Text style={styles.postHeaderCenterTopText}>
+              {first_name} {last_name}
+            </Text>
+            <Text style={styles.postHeaderCenterBottomText}>
+              {postCreatedAt}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.postHeaderRight}>
             <FontAwesome name="ellipsis-h" size={22} color={'#ABA9A7'} />
           </TouchableOpacity>
         </View>
         <View style={styles.postContentText}>
-          <Text>
-            örnek şarküteri kullanıcısı uygulamaya girdiğinde kendi bilgilerini
-            çekmek için istek atıyor. bu istek gerçekleşmiyor. çünkü bu
-            kullanıcıyı admın ekledi . yetkisi yok herhalde
-          </Text>
+          <Text>{postDescription}</Text>
         </View>
         <View style={styles.postContentView}>
-          <Image
-            source={require('../../assets/denemeprofil.jpg')}
-            style={styles.postContentImage}
-          />
+          <Image source={{uri: postImage}} style={styles.postContentImage} />
         </View>
         <View style={styles.likesOrCommitView}>
-          <Text>12 Beğeni</Text>
-          <Text>6 Yorum</Text>
+          <Text>{postLiked} Beğeni</Text>
+          <Text>{postComment} Yorum</Text>
         </View>
         <View style={styles.postFooter}>
           <TouchableOpacity style={styles.likedOrCommitPress}>
@@ -114,13 +125,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ABA9A7',
   },
   postFooter: {
-    paddingVertical: 15,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     borderBottomWidth: 1,
     borderBottomColor: '#ABA9A7',
   },
   likedOrCommitPress: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     flexDirection: 'row',
     height: '100%',
     alignItems: 'center',
