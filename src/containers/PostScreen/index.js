@@ -8,6 +8,7 @@ import {
   Image,
   StatusBar,
   ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
 // import {connect} from 'react-redux';
 // import {SignIn} from '../../store/Actions/Auth/SignIn';
@@ -15,15 +16,20 @@ import {
 import {Formik, Field} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {calcHeight, calcWidth} from '../../settings/dimensions';
+import * as ImagePicker from 'react-native-image-picker';
 import {
   CustomLoginInput,
   CustomPasswordInput,
+  HomeHeader,
   SafeStatusView,
 } from '../../components';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 class PostScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      response: null,
+    };
   }
   render() {
     return (
@@ -32,43 +38,78 @@ class PostScreen extends Component {
         statusBarStyle={'dark-content'}
         safeStyle={{backgroundColor: '#FFFFFF'}}
         content={
-          <KeyboardAwareScrollView style={[styles.container]}>
-            <View style={styles.TopViewStyle}>
-              <Image
-                source={require('../../assets/loginlogo.png')}
-                style={styles.imageStyle}
-              />
+          <>
+            <HomeHeader
+              name="note-plus"
+              color="#fff"
+              headerText={'GÖNDERİ EKLE'}
+              iconSize={34}
+            />
+            <View style={styles.imageSelectStyle}>
+              <ImageBackground
+                source={
+                  !this.state.response
+                    ? require('../../assets/denemeprofil.jpg')
+                    : {uri: this.state.response.uri}
+                  //require('../../assets/denemeprofil.jpg')
+                }
+                style={styles.imageStyle}>
+                <TouchableOpacity
+                  style={styles.settingsButton}
+                  onPress={() => {
+                    ImagePicker.launchImageLibrary(
+                      {
+                        mediaType: 'photo',
+                        includeBase64: true,
+                        maxHeight: 500,
+                        maxWidth: 500,
+                      },
+                      (response) => {
+                        this.setState({response: response});
+                        console.log('response');
+                        console.log(response);
+                        console.log('response');
+                      },
+                      // async (response) => {
+                      //   const {userId} = this.props.SignInReducer;
+                      //   await this.props.WorkerImageAdd(
+                      //     userId,
+                      //     response.base64,
+                      //   );
+                      // },
+                    );
+                  }}>
+                  {!this.state.response ? (
+                    <Text style={styles.nameText}>Fotoğraf Seç</Text>
+                  ) : (
+                    <Text style={styles.nameText}>Fotoğraf Seçildi</Text>
+                  )}
+                </TouchableOpacity>
+              </ImageBackground>
             </View>
-            <Text style={styles.welcomeText}>PostScreen</Text>
-          </KeyboardAwareScrollView>
+          </>
         }
       />
     );
   }
 }
 const styles = StyleSheet.create({
-  goSignup: {
-    width: calcWidth(100) - 60,
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  container: {flex: 1, backgroundColor: '#FFFFFF'},
-  TopViewStyle: {
-    marginTop: calcHeight(4),
-    width: calcWidth(100),
-    height: calcHeight(31),
-  },
+  imageSelectStyle: {height: calcHeight(25), width: calcWidth(100)},
+  container: {flex: 1},
   imageStyle: {
     width: '100%',
     height: '100%',
   },
-  welcomeText: {
-    width: calcWidth(100),
-    height: calcHeight(10),
-    fontSize: 38,
+  settingsButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nameText: {
+    color: '#fff',
+    fontSize: (calcWidth(3) + calcHeight(3)) / 2,
     fontWeight: 'bold',
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    marginBottom: 20,
   },
 });
 // const mapStateToProps = (state) => {

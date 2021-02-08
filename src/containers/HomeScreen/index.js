@@ -30,12 +30,19 @@ class HomeScreen extends Component {
     this.state = {};
   }
   renderHeader = () => {
-    return <HomeHeader />;
+    return (
+      <HomeHeader
+        name="alpha-s-circle-outline"
+        color="#fff"
+        headerText={'SIFIR İSRAF'}
+        iconSize={34}
+      />
+    );
   };
   render() {
     return (
       <SafeStatusView
-        statusBackColor={'red'}
+        statusBackColor={'white'}
         statusBarStyle={'dark-content'}
         safeStyle={{backgroundColor: '#FFFFFF'}}
         content={

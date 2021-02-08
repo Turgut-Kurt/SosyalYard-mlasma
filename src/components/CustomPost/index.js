@@ -42,7 +42,7 @@ class CustomPost extends Component {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.postHeaderRight}>
-            <FontAwesome name="ellipsis-h" size={22} color={'#ABA9A7'} />
+            <FontAwesome name="ellipsis-h" size={22} color={'#d0cecc'} />
           </TouchableOpacity>
         </View>
         <View style={styles.postContentText}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   postHeaderCenterBottomText: {
     fontSize: (calcWidth(1.78) + calcHeight(1.78)) / 2,
-    color: '#ABA9A7',
+    color: '#d0cecc',
   },
   postHeaderRight: {width: '17%', alignItems: 'flex-end'},
   postContentText: {paddingVertical: 10},
@@ -122,13 +122,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ABA9A7',
+    borderBottomColor: '#d0cecc',
   },
   postFooter: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     borderBottomWidth: 1,
-    borderBottomColor: '#ABA9A7',
+    borderBottomColor: '#d0cecc',
   },
   likedOrCommitPress: {
     paddingVertical: 10,
