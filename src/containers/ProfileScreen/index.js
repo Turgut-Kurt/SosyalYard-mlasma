@@ -134,7 +134,6 @@ class ProfileScreen extends Component {
               ListHeaderComponent={this.renderHeader(data)}
               keyExtractor={(item) => item.id.toString()}
               data={data.posts}
-              //onEndReached={this.getMoreUsers}
               onEndReachedThreshold={0.5}
               onEndThreshold={0}
               renderItem={({item, index}) => (
