@@ -15,7 +15,7 @@ class CustomMyPost extends Component {
   }
   render() {
     const {description, imageUrl, comments, likes, createdAt} = this.props;
-    const {loading, data, error} = this.props.GetWorkerReducer;
+    const {data} = this.props.GetWorkerReducer;
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
