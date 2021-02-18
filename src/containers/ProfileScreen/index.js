@@ -45,20 +45,13 @@ class ProfileScreen extends Component {
     });
   };
   renderHeader = (data) => {
-    let base64UserImg = `data:image/png;base64,${data.imageUrl}`;
     if (data) {
       if (Object.keys(data).length > 0) {
-        console.log(Object.keys(data).length);
-        console.log(data.length);
-        console.log(data.firstName);
-
         return (
           <View style={styles.Header}>
             <View style={styles.Top}>
               <ImageBackground
-                source={
-                  base64UserImg.length > 100 ? {uri: base64UserImg} : PROFIL
-                }
+                source={data.imageUrl ? {uri: data.imageUrl} : PROFIL}
                 style={styles.imageStyle}>
                 <Text style={styles.nameText}>
                   {` ${data.firstName} ${data.lastName}`}
@@ -80,9 +73,7 @@ class ProfileScreen extends Component {
                           userId,
                           response.base64,
                         );
-                        debugger;
                         await this.fetchData();
-                        debugger;
                       },
                       // async (response) => {
                       //   const {userId} = this.props.SignInReducer;
@@ -136,9 +127,6 @@ class ProfileScreen extends Component {
     }
     if (data) {
       if (Object.keys(data).length > 0) {
-        console.log('data');
-        console.log(data);
-        console.log('data');
         return (
           <View style={styles.Footer}>
             <FlatList
@@ -162,9 +150,6 @@ class ProfileScreen extends Component {
   };
   render() {
     const {loading: l0, data: d0, error: e0} = this.props.GetWorkerReducer;
-    console.log('e0');
-    console.log(e0);
-    console.log('e0');
     return (
       <SafeStatusView
         statusBackColor={'#456BFF'}
@@ -176,8 +161,8 @@ class ProfileScreen extends Component {
   }
 }
 const styles = StyleSheet.create({
-  flatStyle: {},
-  Header: {height: calcHeight(45)},
+  flatStyle: {marginBottom: calcHeight(8)},
+  Header: {height: calcHeight(45), marginBottom: calcHeight(2)},
   Top: {height: calcHeight(34)},
   imageStyle: {
     width: '100%',
@@ -186,7 +171,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     position: 'absolute',
-    color: '#000',
+    color: 'gray',
     fontSize: (calcWidth(3) + calcHeight(3)) / 2,
     fontWeight: 'bold',
     bottom: 20,
@@ -198,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   selectImageText: {
-    color: '#000',
+    color: 'gray',
     fontSize: (calcWidth(3) + calcHeight(3)) / 2,
     fontWeight: 'bold',
   },

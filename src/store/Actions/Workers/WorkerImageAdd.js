@@ -7,12 +7,16 @@ import {
 import {fetchingRequest, fetchingSuccess, fetchingFailure} from '../index';
 
 export const WorkerImageAdd = (id, uri) => {
+  let imageUrl = `data:image/png;base64,${uri}`;
+  console.log('uri');
+  console.log(uri);
+  console.log('uri');
   return async (dispatch) => {
     dispatch(fetchingRequest(WORKER_IMAGE_ADD_PENDING));
     try {
       const response = await api.post('user/image', {
         id,
-        uri,
+        imageUrl,
       });
       const payload = await response.data;
       dispatch(fetchingSuccess(WORKER_IMAGE_ADD_FULFILLED, payload));

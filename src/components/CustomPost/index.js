@@ -70,27 +70,17 @@ class CustomPost extends Component {
       posts,
       comments,
     } = this.props;
-    console.log(
-      '*********************************************************************************************',
-    );
-    console.log(this.props);
-    console.log(
-      '*********************************************************************************************',
-    );
-    let base64 = `data:image/png;base64,${imageUrl}`;
-    let base64UserImg = `data:image/png;base64,${applicationUserViewDto.imageUrl}`;
-    console.log('base64UserImg');
-    console.log(base64UserImg);
-    console.log('base64UserImg');
-
+    console.log('imageUrl');
+    console.log(imageUrl);
+    console.log('imageUrl');
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
-          {base64UserImg.length > 100 ? (
+          {applicationUserViewDto.imageUrl ? (
             <TouchableOpacity
               style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
               <Image
-                source={{uri: base64UserImg}}
+                source={{uri: applicationUserViewDto.imageUrl}}
                 style={styles.imageProfileStyle}
               />
             </TouchableOpacity>
@@ -114,9 +104,9 @@ class CustomPost extends Component {
         <View style={styles.postContentText}>
           <Text>{description}</Text>
         </View>
-        {base64.length > 100 ? (
+        {imageUrl ? (
           <View style={styles.postContentView}>
-            <Image source={{uri: base64}} style={styles.postContentImage} />
+            <Image source={{uri: imageUrl}} style={styles.postContentImage} />
           </View>
         ) : null}
 

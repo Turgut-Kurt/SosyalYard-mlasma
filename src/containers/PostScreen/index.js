@@ -46,16 +46,16 @@ class PostScreen extends Component {
     let district = 0;
     let resp = '';
     if (this.state.response === null) {
-      resp = 'img url yok';
-    } else {
       resp = this.state.response;
+    } else {
+      resp = this.state.response.base64;
     }
     const {userId} = await this.props.SignInReducer;
     try {
       await this.props.PostAdd(
         userId,
         description,
-        resp.base64,
+        resp,
         category,
         province,
         district,

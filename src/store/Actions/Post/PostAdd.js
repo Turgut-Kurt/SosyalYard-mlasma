@@ -4,11 +4,12 @@ import {fetchingRequest, fetchingSuccess, fetchingFailure} from '../index';
 export const PostAdd = (
   userId,
   description,
-  imageUrl,
+  uri,
   category,
   province,
   district,
 ) => {
+  let imageUrl = `data:image/png;base64,${uri}`;
   return async (dispatch) => {
     dispatch(fetchingRequest(POST_ADD_PENDING));
     try {

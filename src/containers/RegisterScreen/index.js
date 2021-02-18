@@ -113,7 +113,7 @@ class RegisterScreen extends Component {
                 email: '',
                 password: '',
               }}
-              onSubmit={this.convertImageToBase64}>
+              onSubmit={this._handleSubmit}>
               {({handleSubmit, isValid}) => (
                 <>
                   <View style={styles.inputViewStyle}>

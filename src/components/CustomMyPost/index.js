@@ -24,25 +24,14 @@ class CustomMyPost extends Component {
       id,
       createdAt,
     } = this.props;
-    console.log(
-      'this.props.*********************************************************************************************',
-    );
-    console.log(this.props);
-    console.log(
-      'this.props.*********************************************************************************************',
-    );
     const {loading, data, error} = this.props.GetWorkerReducer;
-    let base64 = `data:image/png;base64,${imageUrl}`;
-    let base64UserImg = `data:image/png;base64,${data.imageUrl}`;
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
           <TouchableOpacity
             style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
             <Image
-              source={
-                base64UserImg.length > 100 ? {uri: base64UserImg} : PROFIL
-              }
+              source={data.imageUrl ? {uri: data.imageUrl} : PROFIL}
               style={styles.imageProfileStyle}
             />
           </TouchableOpacity>
@@ -61,9 +50,9 @@ class CustomMyPost extends Component {
         <View style={styles.postContentText}>
           <Text>{description}</Text>
         </View>
-        {base64.length > 100 ? (
+        {imageUrl ? (
           <View style={styles.postContentView}>
-            <Image source={{uri: base64}} style={styles.postContentImage} />
+            <Image source={{uri: imageUrl}} style={styles.postContentImage} />
           </View>
         ) : null}
         <View style={styles.likesOrCommitView}>
@@ -87,8 +76,7 @@ class CustomMyPost extends Component {
 const styles = StyleSheet.create({
   postView: {
     alignSelf: 'center',
-    marginTop: calcHeight(1),
-    marginBottom: calcHeight(3),
+    marginBottom: calcHeight(2),
     borderRadius: 10,
     width: calcWidth(100) - 40,
     shadowColor: '#000',
