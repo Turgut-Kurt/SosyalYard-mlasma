@@ -9,9 +9,9 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-// import {connect} from 'react-redux';
-// import {SignIn} from '../../store/Actions/Auth/SignIn';
-// import AuthControl from '../../utils/AuthControl';
+import {connect} from 'react-redux';
+import {SignIn} from '../../store/Actions/Auth/SignIn';
+import AuthControl from '../../utils/AuthControl';
 import {Formik, Field} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import LoginValidationSchema from '../../schema/LoginValidation';
@@ -21,6 +21,7 @@ import {
   CustomPasswordInput,
   SafeStatusView,
 } from '../../components';
+import NavigationService from '../../services/NavigationService';
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
@@ -29,26 +30,29 @@ class LoginScreen extends Component {
       errors: '',
     };
   }
-  // _handleSubmit = async (values, {resetForm}) => {
-  //   await this.setState({loading: true});
-  //   const {userName, password} = values;
-  //   try {
-  //     await this.props.SignIn(userName, password);
-  //     const {token, userId, role, error} = await this.props.SignInReducer;
-  //     if (token !== null && userId !== null && role !== null) {
-  //       await AuthControl.saveToken('token', token, false);
-  //       await AuthControl.saveToken('userId', userId, false);
-  //       await AuthControl.saveToken('role', role, false);
-  //       resetForm();
-  //     }
-  //     if (error) {
-  //       this.errorRender(error);
-  //     }
-  //     this.setState({loading: false});
-  //   } catch (error) {
-  //     this.setState({loading: false});
-  //   }
-  // };
+  _handleSubmit = async (values, {resetForm}) => {
+    await this.setState({loading: true});
+    const {userName, password} = values;
+    try {
+      await this.props.SignIn(userName, password);
+      const {token, userId, role, error} = await this.props.SignInReducer;
+      if (token !== null && userId !== null && role !== null) {
+        await AuthControl.saveToken('token', token, false);
+        await AuthControl.saveToken('userId', userId, false);
+        await AuthControl.saveToken('role', role, false);
+        resetForm();
+      }
+      if (error) {
+        this.errorRender(error);
+      }
+      this.setState({loading: false});
+    } catch (error) {
+      this.setState({loading: false});
+    }
+  };
+  gotoSignup = () => {
+    NavigationService.navigate('RegisterScreen');
+  };
   errorRender = (error) => {
     this.setState({
       errors: error,
@@ -65,7 +69,7 @@ class LoginScreen extends Component {
           <KeyboardAwareScrollView style={[styles.container]}>
             <View style={styles.TopViewStyle}>
               <Image
-                source={require('../../assets/loginlogo.png')}
+                source={require('../../assets/deneme.jpg')}
                 style={styles.imageStyle}
               />
             </View>
@@ -74,7 +78,7 @@ class LoginScreen extends Component {
               validateOnMount={true}
               validationSchema={LoginValidationSchema}
               initialValues={{
-                email: '',
+                userName: '',
                 password: '',
               }}
               onSubmit={this._handleSubmit}>
@@ -83,8 +87,8 @@ class LoginScreen extends Component {
                   <View style={styles.inputViewStyle}>
                     <Field
                       component={CustomLoginInput}
-                      name="email"
-                      placeholder="Email"
+                      name="userName"
+                      placeholder="Kullanıcı Adı"
                       placeholderTextColor="#8E9092"
                     />
                   </View>
@@ -116,7 +120,9 @@ class LoginScreen extends Component {
                           onPress={handleSubmit}>
                           <Text style={styles.ButtonText}>GİRİŞ YAP</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.goSignup}>
+                        <TouchableOpacity
+                          style={styles.goSignup}
+                          onPress={this.gotoSignup}>
                           <Text>Hesabın yok mu ? O halde kayıt ol.</Text>
                         </TouchableOpacity>
                       </>
@@ -156,6 +162,8 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: '100%',
     height: '100%',
+    resizeMode: 'center',
+    borderWidth: 1,
   },
 
   welcomeText: {
@@ -172,7 +180,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ActiveButton: {
-    backgroundColor: '#FF6363',
+    backgroundColor: '#456BFF',
     borderRadius: 5,
     width: calcWidth(100) - 60,
     height: calcHeight(100) / 16,
@@ -217,15 +225,15 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
 });
-// const mapStateToProps = (state) => {
-//   return {
-//     SignInReducer: state.SignInReducer,
-//   };
-// };
-//
-// const mapDispatchToProps = {
-//   SignIn,
-// };
-//
-// LoginScreen = connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
+const mapStateToProps = (state) => {
+  return {
+    SignInReducer: state.SignInReducer,
+  };
+};
+
+const mapDispatchToProps = {
+  SignIn,
+};
+
+LoginScreen = connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 export default LoginScreen;

@@ -6,12 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  StatusBar,
+  Alert,
+  ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-// import {connect} from 'react-redux';
-// import {SignIn} from '../../store/Actions/Auth/SignIn';
-// import AuthControl from '../../utils/AuthControl';
+import {connect} from 'react-redux';
+import {SignIn} from '../../store/Actions/Auth/SignIn';
+import {WorkerAdd} from '../../store/Actions/Workers/WorkerAdd';
+import AuthControl from '../../utils/AuthControl';
 import {Formik, Field} from 'formik';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import RegisterValidationSchema from '../../schema/RegisterValidation';
@@ -21,34 +23,66 @@ import {
   CustomPasswordInput,
   SafeStatusView,
 } from '../../components';
+import NavigationService from '../../services/NavigationService';
+
 class RegisterScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
       errors: '',
+      profilImageBase64: '',
     };
   }
-  // _handleSubmit = async (values, {resetForm}) => {
-  //   await this.setState({loading: true});
-  //   const {userName, password} = values;
-  //   try {
-  //     await this.props.SignIn(userName, password);
-  //     const {token, userId, role, error} = await this.props.SignInReducer;
-  //     if (token !== null && userId !== null && role !== null) {
-  //       await AuthControl.saveToken('token', token, false);
-  //       await AuthControl.saveToken('userId', userId, false);
-  //       await AuthControl.saveToken('role', role, false);
-  //       resetForm();
-  //     }
-  //     if (error) {
-  //       this.errorRender(error);
-  //     }
-  //     this.setState({loading: false});
-  //   } catch (error) {
-  //     this.setState({loading: false});
-  //   }
-  // };
+  handleBackButton = () => {
+    this.props.navigation.goBack();
+  };
+  _handleSubmit = async (values, {resetForm}) => {
+    await this.setState({loading: true});
+    const {userName, phoneNumber, password, email} = values;
+    let firstName = 's';
+    let lastName = 's';
+    let department = '1';
+    try {
+      await this.props.WorkerAdd(
+        email,
+        phoneNumber,
+        firstName,
+        lastName,
+        userName,
+        password,
+        department,
+      );
+      const {data, error, loading} = await this.props.WorkerAddReducer;
+      if (data !== null && error === null) {
+        await this.props.SignIn(userName, password);
+        const {token, userId, role} = await this.props.SignInReducer;
+        if (token !== null && userId !== null && role !== null) {
+          await AuthControl.saveToken('token', token, false);
+          await AuthControl.saveToken('userId', userId, false);
+          await AuthControl.saveToken('role', role, false);
+        }
+        console.log('data');
+        console.log(data);
+        console.log('data');
+        console.log('error');
+        console.log(error);
+        console.log('error');
+        ToastAndroid.show(
+          'Kullanıcı başarıyla kayıt edildi.',
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        resetForm();
+      }
+      if (error) {
+        Alert.alert('İşlem başarısız oldu.');
+      }
+      this.setState({loading: false});
+    } catch (error) {
+      this.setState({loading: false});
+    }
+  };
   errorRender = (error) => {
     this.setState({
       errors: error,
@@ -65,7 +99,7 @@ class RegisterScreen extends Component {
           <KeyboardAwareScrollView style={[styles.container]}>
             <View style={styles.TopViewStyle}>
               <Image
-                source={require('../../assets/loginlogo.png')}
+                source={require('../../assets/deneme.jpg')}
                 style={styles.imageStyle}
               />
             </View>
@@ -74,28 +108,30 @@ class RegisterScreen extends Component {
               validateOnMount={true}
               validationSchema={RegisterValidationSchema}
               initialValues={{
-                name: '',
-                surName: '',
+                userName: '',
+                phoneNumber: '',
                 email: '',
                 password: '',
               }}
-              onSubmit={this._handleSubmit}>
+              onSubmit={this.convertImageToBase64}>
               {({handleSubmit, isValid}) => (
                 <>
                   <View style={styles.inputViewStyle}>
                     <Field
                       component={CustomLoginInput}
-                      name="name"
-                      placeholder="İsim"
+                      name="userName"
+                      placeholder="Kullanıcı Adı"
                       placeholderTextColor="#8E9092"
                     />
                   </View>
                   <View style={styles.inputViewStyle}>
                     <Field
                       component={CustomLoginInput}
-                      name="surName"
-                      placeholder="Soyisim"
+                      name="phoneNumber"
+                      placeholder="Telefon (Zorunlu)"
                       placeholderTextColor="#8E9092"
+                      keyboardType="numeric"
+                      maxLength={11}
                     />
                   </View>
                   <View style={styles.inputViewStyle}>
@@ -134,7 +170,9 @@ class RegisterScreen extends Component {
                           onPress={handleSubmit}>
                           <Text style={styles.ButtonText}>KAYIT OL</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.goSignup}>
+                        <TouchableOpacity
+                          style={styles.goSignup}
+                          onPress={this.handleBackButton}>
                           <Text>
                             Zaten bir hesabın var mı ? O halde Giriş Yap
                           </Text>
@@ -192,7 +230,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ActiveButton: {
-    backgroundColor: '#FF6363',
+    backgroundColor: '#456BFF',
     borderRadius: 5,
     width: calcWidth(100) - 60,
     height: calcHeight(100) / 16,
@@ -237,15 +275,17 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
 });
-// const mapStateToProps = (state) => {
-//   return {
-//     SignInReducer: state.SignInReducer,
-//   };
-// };
-//
-// const mapDispatchToProps = {
-//   SignIn,
-// };
-//
-// RegisterScreen = connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
+const mapStateToProps = (state) => {
+  return {
+    SignInReducer: state.SignInReducer,
+    WorkerAddReducer: state.WorkerAddReducer,
+  };
+};
+
+const mapDispatchToProps = {
+  SignIn,
+  WorkerAdd,
+};
+
+RegisterScreen = connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
 export default RegisterScreen;

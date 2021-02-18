@@ -4,6 +4,8 @@ const navigationRef = React.createRef();
 function navigate(name, params) {
   navigationRef.current?.navigate(name, params);
 }
+// add other navigation functions that you need and export them
+
 function navigate12(routeName, params) {
   navigationRef.dispatch(
     CommonActions.navigate({
@@ -12,6 +14,7 @@ function navigate12(routeName, params) {
     }),
   );
 }
+
 export default {
   navigate12,
   navigate,

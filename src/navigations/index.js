@@ -5,31 +5,102 @@ import LoginScreen from '../containers/LoginScreen';
 import RegisterScreen from '../containers/RegisterScreen';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeScreen from '../containers/HomeScreen';
+import {DrawerActions} from '@react-navigation/native';
 import PostScreen from '../containers/PostScreen';
 import ProfileScreen from '../containers/ProfileScreen';
+import AuthLoadingScreen from '../containers/AuthLoadingScreen';
+import ProfileUpdateScreen from '../containers/ProfileUpdateScreen';
+import PostSettingsScreen from '../containers/PostSettingsScreen';
+import CommentScreen from '../containers/CommentScreen';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import AuthControl from '../utils/AuthControl';
 const RouteStack = createStackNavigator();
+const HomeStack = createStackNavigator();
 const BottomTab = createMaterialBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+function CustomDrawerContent(props) {
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem
+        label="Çıkış Yap"
+        onPress={() => {
+          logout();
+          props.navigation.dispatch(DrawerActions.closeDrawer());
+        }}
+      />
+    </DrawerContentScrollView>
+  );
+}
+const logout = () => {
+  AuthControl.removeToken();
+};
 const Router = () => (
   <RouteStack.Navigator
-    iinitialRouteName="Bottom"
+    iinitialRouteName={'AuthLoadingScreen'}
     headerMode="screen"
     screenOptions={{
       headerShown: false,
     }}>
-    {/*<RouteStack.Screen name="Loading" component={RegisterScreen} />*/}
-    {/*<RouteStack.Screen name="Login" component={LoginScreen} />*/}
-    <RouteStack.Screen name="Bottom" component={BottomTabNav} />
+    <RouteStack.Screen
+      name={'AuthLoadingScreen'}
+      component={AuthLoadingScreen}
+    />
+    <RouteStack.Screen name={'RegisterScreen'} component={RegisterScreen} />
+    <RouteStack.Screen name={'LoginScreen'} component={LoginScreen} />
+    <RouteStack.Screen name={'BottomTabNav'} component={BottomTabNav} />
   </RouteStack.Navigator>
 );
-
+const Home = () => (
+  <HomeStack.Navigator
+    iinitialRouteName={'HomeScreen'}
+    headerMode="screen"
+    screenOptions={{
+      headerShown: false,
+    }}>
+    <HomeStack.Screen name={'HomeScreen'} component={HomeScreen} />
+    <HomeStack.Screen name={'CommentScreen'} component={CommentScreen} />
+  </HomeStack.Navigator>
+);
+const DrawerNav = () => (
+  <Drawer.Navigator
+    drawerPosition="right"
+    iinitialRouteName={'ProfileUpdateScreen'}
+    headerMode="screen"
+    screenOptions={{
+      headerShown: false,
+    }}
+    drawerContent={(props) => <CustomDrawerContent {...props} />}>
+    <Drawer.Screen
+      name={'ProfileScreen'}
+      component={ProfileScreen}
+      options={{drawerLabel: 'Profilim'}}
+    />
+    <Drawer.Screen
+      name={'ProfileUpdateScreen'}
+      component={ProfileUpdateScreen}
+      options={{drawerLabel: 'Bilgilerimi Güncelle'}}
+    />
+    <Drawer.Screen
+      name={'PostSettingsScreen'}
+      component={PostSettingsScreen}
+      options={{drawerLabel: 'Gönderi Ayarları'}}
+    />
+  </Drawer.Navigator>
+);
 const BottomTabNav = () => (
   <BottomTab.Navigator
-    initialRouteName="HomeScreen"
+    initialRouteName="Home"
     activeColor="#fff"
     barStyle={{backgroundColor: '#456BFF'}}>
     <BottomTab.Screen
-      name="HomeScreen"
-      component={HomeScreen}
+      name="Home"
+      component={Home}
       options={{
         tabBarLabel: 'Anasayfa',
         tabBarIcon: ({color}) => (
@@ -52,8 +123,8 @@ const BottomTabNav = () => (
       }}
     />
     <BottomTab.Screen
-      name="ProfileScreen"
-      component={ProfileScreen}
+      name="DrawerNav"
+      component={DrawerNav}
       options={{
         tabBarLabel: 'Profil',
         tabBarIcon: ({color}) => (

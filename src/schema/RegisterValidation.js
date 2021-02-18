@@ -1,13 +1,13 @@
 import * as yup from 'yup';
 const RegisterValidationSchema = yup.object().shape({
-  name: yup
+  userName: yup
     .string()
-    .min(3, ({min}) => `En az ${min} karakter olmalıdır.`)
-    .required('İsim zorunlu'),
-  surName: yup
+    .min(5, ({min}) => `En az ${min} karakter olmalıdır.`)
+    .required('Kullanıcı adı zorunlu'),
+  phoneNumber: yup
     .string()
-    .min(3, ({min}) => `En az ${min} karakter olmalıdır.`)
-    .required('Soyisim zorunlu'),
+    .min(11, ({min}) => `En az ${min} karakter olmalıdır.`)
+    .required('Telefon numarası zorunlu'),
   email: yup.string().email('geçersiz email').required('gerekli alan'),
   password: yup
     .string()

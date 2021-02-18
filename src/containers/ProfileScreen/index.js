@@ -1,98 +1,206 @@
 import React, {Component} from 'react';
 import {
-  SafeAreaView,
   Text,
   View,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
-  StatusBar,
   ActivityIndicator,
   FlatList,
 } from 'react-native';
-// import {connect} from 'react-redux';
-// import {SignIn} from '../../store/Actions/Auth/SignIn';
-// import AuthControl from '../../utils/AuthControl';
-import {Formik, Field} from 'formik';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {connect} from 'react-redux';
+import {SignIn} from '../../store/Actions/Auth/SignIn';
+import {GetWorker} from '../../store/Actions/Workers/GetWorker';
+import {WorkerImageAdd} from '../../store/Actions/Workers/WorkerImageAdd';
 import {calcHeight, calcWidth} from '../../settings/dimensions';
-import {
-  CustomLoginInput,
-  CustomPasswordInput,
-  CustomPost,
-  SafeStatusView,
-} from '../../components';
-import postData from '../../data/postData';
+import {PROFIL} from '../../assets';
+import {CustomMyPost, SafeStatusView} from '../../components';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as ImagePicker from 'react-native-image-picker';
 class ProfileScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      loading: false,
+      errors: null,
+      data: [],
+    };
   }
-  renderHeader = () => {
-    return (
-      <View style={styles.Header}>
-        <View style={styles.Top}>
-          <ImageBackground
-            source={require('../../assets/denemeprofil.jpg')}
-            style={styles.imageStyle}>
-            <Text style={styles.nameText}>Özkan Tabak</Text>
-            <TouchableOpacity style={styles.settingsButton}>
-              <MaterialCommunityIcons name="cog" size={40} color="#fff" />
-            </TouchableOpacity>
-          </ImageBackground>
-        </View>
-        <View style={styles.Bottom}>
-          <Text style={styles.postTextStyle}>15 {`\n`}Gönderiler</Text>
-          <Text style={styles.postTextStyle}>25 {`\n`}Beğeniler</Text>
-          <Text style={styles.postTextStyle}>35 {`\n`}Yorumlar</Text>
-        </View>
-      </View>
-    );
+  componentDidMount = async () => {
+    this._unsubscribe = this.props.navigation.addListener('focus', async () => {
+      this.fetchData();
+    });
+  };
+  componentWillUnmount() {
+    this._unsubscribe();
+  }
+  fetchData = async () => {
+    const {userId} = await this.props.SignInReducer;
+    await this.props.GetWorker(userId);
+    const {loading, data, error} = this.props.GetWorkerReducer;
+    this.setState({
+      loading: loading,
+      errors: error,
+      data: data,
+    });
+  };
+  renderHeader = (data) => {
+    let base64UserImg = `data:image/png;base64,${data.imageUrl}`;
+    if (data) {
+      if (Object.keys(data).length > 0) {
+        console.log(Object.keys(data).length);
+        console.log(data.length);
+        console.log(data.firstName);
+
+        return (
+          <View style={styles.Header}>
+            <View style={styles.Top}>
+              <ImageBackground
+                source={
+                  base64UserImg.length > 100 ? {uri: base64UserImg} : PROFIL
+                }
+                style={styles.imageStyle}>
+                <Text style={styles.nameText}>
+                  {` ${data.firstName} ${data.lastName}`}
+                </Text>
+                <TouchableOpacity
+                  style={styles.selectImageButton}
+                  onPress={() => {
+                    ImagePicker.launchImageLibrary(
+                      {
+                        mediaType: 'photo',
+                        includeBase64: true,
+                        maxHeight: 500,
+                        maxWidth: 500,
+                      },
+                      async (response) => {
+                        this.setState({response: response});
+                        const {userId} = this.props.SignInReducer;
+                        await this.props.WorkerImageAdd(
+                          userId,
+                          response.base64,
+                        );
+                        debugger;
+                        await this.fetchData();
+                        debugger;
+                      },
+                      // async (response) => {
+                      //   const {userId} = this.props.SignInReducer;
+                      //   await this.props.WorkerImageAdd(
+                      //     userId,
+                      //     response.base64,
+                      //   );
+                      //   debugger;
+                      //   await this.fetchData();
+                      //   debugger;
+                      // },
+                    );
+                  }}>
+                  {!this.state.response ? (
+                    <Text style={styles.selectImageText}>Fotoğraf Seç</Text>
+                  ) : (
+                    <Text style={styles.selectImageText}>Fotoğraf Seçildi</Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.settingsButton}
+                  onPress={() => this.props.navigation.openDrawer()}>
+                  <MaterialCommunityIcons name="cog" size={40} color="#fff" />
+                </TouchableOpacity>
+              </ImageBackground>
+            </View>
+            <View style={styles.Bottom}>
+              <Text style={styles.postTextStyle}>
+                {data.posts.length} {`\n`}Gönderiler
+              </Text>
+              <Text style={styles.postTextStyle}>
+                {data.likes ? data.likes : '0'} {`\n`}Beğeniler
+              </Text>
+              <Text style={styles.postTextStyle}>
+                {data.comments ? data.comments : '0'} {`\n`}Yorumlar
+              </Text>
+            </View>
+          </View>
+        );
+      } else {
+        return <Text>Love Celal Atalar</Text>;
+      }
+    }
+  };
+  renderItems = (loading, data, error) => {
+    if (loading) {
+      return <ActivityIndicator size={40} />;
+    }
+    if (error) {
+      return <Text>Bir Hata Oluştu</Text>;
+    }
+    if (data) {
+      if (Object.keys(data).length > 0) {
+        console.log('data');
+        console.log(data);
+        console.log('data');
+        return (
+          <View style={styles.Footer}>
+            <FlatList
+              style={styles.flatStyle}
+              ListHeaderComponent={this.renderHeader(data)}
+              keyExtractor={(item) => item.id.toString()}
+              data={data.posts}
+              //onEndReached={this.getMoreUsers}
+              onEndReachedThreshold={0.5}
+              onEndThreshold={0}
+              renderItem={({item, index}) => (
+                <CustomMyPost key={index} {...item} />
+              )}
+            />
+          </View>
+        );
+      } else {
+        return <></>;
+      }
+    }
   };
   render() {
+    const {loading: l0, data: d0, error: e0} = this.props.GetWorkerReducer;
+    console.log('e0');
+    console.log(e0);
+    console.log('e0');
     return (
       <SafeStatusView
-        statusBackColor={'#fff'}
-        statusBarStyle={'dark-content'}
+        statusBackColor={'#456BFF'}
+        statusBarStyle={'white'}
         safeStyle={{backgroundColor: '#FFFFFF'}}
-        content={
-          <>
-            <View style={styles.Footer}>
-              <FlatList
-                nestedScrollEnabled
-                style={styles.flatStyle}
-                ListHeaderComponent={this.renderHeader}
-                keyExtractor={(item) => item.id.toString()}
-                data={postData}
-                //onEndReached={this.getMoreUsers}
-                onEndReachedThreshold={0.5}
-                onEndThreshold={0}
-                renderItem={({item, index}) => (
-                  <CustomPost key={index} {...item} />
-                )}
-              />
-            </View>
-          </>
-        }
+        content={this.renderItems(l0, d0, e0)}
       />
     );
   }
 }
 const styles = StyleSheet.create({
+  flatStyle: {},
   Header: {height: calcHeight(45)},
   Top: {height: calcHeight(34)},
   imageStyle: {
     width: '100%',
     height: '100%',
     alignItems: 'center',
-    justifyContent: 'flex-end',
   },
   nameText: {
-    color: '#fff',
+    position: 'absolute',
+    color: '#000',
     fontSize: (calcWidth(3) + calcHeight(3)) / 2,
     fontWeight: 'bold',
-    marginBottom: 20,
+    bottom: 20,
+  },
+  selectImageButton: {
+    width: 300,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectImageText: {
+    color: '#000',
+    fontSize: (calcWidth(3) + calcHeight(3)) / 2,
+    fontWeight: 'bold',
   },
   Bottom: {
     height: calcHeight(11),
@@ -123,15 +231,18 @@ const styles = StyleSheet.create({
   },
   Footer: {height: calcHeight(100)},
 });
-// const mapStateToProps = (state) => {
-//   return {
-//     SignInReducer: state.SignInReducer,
-//   };
-// };
-//
-// const mapDispatchToProps = {
-//   SignIn,
-// };
-//
-// ProfileScreen = connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);
+const mapStateToProps = (state) => {
+  return {
+    SignInReducer: state.SignInReducer,
+    GetWorkerReducer: state.GetWorkerReducer,
+  };
+};
+
+const mapDispatchToProps = {
+  SignIn,
+  GetWorker,
+  WorkerImageAdd,
+};
+
+ProfileScreen = connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);
 export default ProfileScreen;

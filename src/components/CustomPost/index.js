@@ -1,44 +1,110 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ToastAndroid,
+  Alert,
+  TextInput,
+  FlatList,
+} from 'react-native';
+import NavigationService from '../../services/NavigationService';
 import EvilIcons from 'react-native-vector-icons/dist/EvilIcons';
 import FontAwesome from 'react-native-vector-icons/dist/FontAwesome5';
 import {calcHeight, calcWidth} from '../../settings/dimensions';
+import {LikeAdd} from '../../store/Actions/Like/LikeAdd';
+import moment from 'moment';
+import {connect} from 'react-redux';
+import Data from '../../data/postData';
+import {PROFIL} from '../../assets';
 class CustomPost extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
+  likeFunction = async () => {
+    const {userId} = await this.props.SignInReducer;
+    console.log(userId);
+    console.log(this.props.id);
+    console.log(this.props.likeCount);
+    console.log(this.props.likeCount + 1);
+    let count = this.props.likeCount + 1;
+    try {
+      await this.props.LikeAdd(userId, this.props.id, count);
+      const {data, error} = await this.props.LikeAddReducer;
+      console.log('error');
+      console.log(error);
+      console.log('error');
+      console.log('data');
+      console.log(data);
+      console.log('data');
+      if (data !== null && error === null) {
+        ToastAndroid.show(
+          'beğendildi.',
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+      }
+      if (error) {
+        Alert.alert('beğenme basarısız');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  gotoComment = () => {
+    NavigationService.navigate('CommentScreen', {items: this.props});
+  };
   render() {
     const {
+      applicationUserViewDto,
       id,
-      first_name,
-      last_name,
-      profilePicture,
-      postDescription,
-      postCreatedAt,
-      postLiked,
-      postComment,
-      postImage,
+      description,
+      imageUrl,
+      likeCount,
+      commentCount,
+      modifiedAt,
+      createdBy,
+      posts,
+      comments,
     } = this.props;
-    console.log('profilePicture');
-    console.log(profilePicture);
-    console.log('profilePicture');
+    console.log(
+      '*********************************************************************************************',
+    );
+    console.log(this.props);
+    console.log(
+      '*********************************************************************************************',
+    );
+    let base64 = `data:image/png;base64,${imageUrl}`;
+    let base64UserImg = `data:image/png;base64,${applicationUserViewDto.imageUrl}`;
+    console.log('base64UserImg');
+    console.log(base64UserImg);
+    console.log('base64UserImg');
+
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
-          <TouchableOpacity
-            style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
-            <Image
-              source={{uri: profilePicture}}
-              style={styles.imageProfileStyle}
-            />
-          </TouchableOpacity>
+          {base64UserImg.length > 100 ? (
+            <TouchableOpacity
+              style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
+              <Image
+                source={{uri: base64UserImg}}
+                style={styles.imageProfileStyle}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.postHeaderLeft, styles.postCommonHeaderLeftRight]}>
+              <Image source={PROFIL} style={styles.imageProfileStyle} />
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity style={styles.postHeaderCenter}>
-            <Text style={styles.postHeaderCenterTopText}>
-              {first_name} {last_name}
-            </Text>
+            <Text style={styles.postHeaderCenterTopText}>{createdBy}</Text>
             <Text style={styles.postHeaderCenterBottomText}>
-              {postCreatedAt}
+              {moment(modifiedAt).format('DD.MM.YYYY HH:mm')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.postHeaderRight}>
@@ -46,22 +112,34 @@ class CustomPost extends Component {
           </TouchableOpacity>
         </View>
         <View style={styles.postContentText}>
-          <Text>{postDescription}</Text>
+          <Text>{description}</Text>
         </View>
-        <View style={styles.postContentView}>
-          <Image source={{uri: postImage}} style={styles.postContentImage} />
-        </View>
+        {base64.length > 100 ? (
+          <View style={styles.postContentView}>
+            <Image source={{uri: base64}} style={styles.postContentImage} />
+          </View>
+        ) : null}
+
         <View style={styles.likesOrCommitView}>
-          <Text>{postLiked} Beğeni</Text>
-          <Text>{postComment} Yorum</Text>
+          <Text>{likeCount} Beğeni</Text>
+          <Text>{commentCount} Yorum</Text>
         </View>
         <View style={styles.postFooter}>
-          <TouchableOpacity style={styles.likedOrCommitPress}>
-            <EvilIcons name="like" size={26} />
+          <TouchableOpacity
+            style={styles.likedOrCommitPress}
+            onPress={this.likeFunction}>
+            <EvilIcons name="like" size={28} />
             <Text>Beğen</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.likedOrCommitPress}>
-            <EvilIcons name="comment" size={26} color="gray" />
+          <TouchableOpacity
+            style={styles.likedOrCommitPress}
+            onPress={this.gotoComment}>
+            <EvilIcons
+              name="comment"
+              backgroundColor="gray"
+              size={28}
+              color="gray"
+            />
             <Text>Yorum Yap</Text>
           </TouchableOpacity>
         </View>
@@ -72,7 +150,8 @@ class CustomPost extends Component {
 const styles = StyleSheet.create({
   postView: {
     alignSelf: 'center',
-    marginTop: calcHeight(5),
+    marginTop: calcHeight(1),
+    marginBottom: calcHeight(3),
     borderRadius: 10,
     width: calcWidth(100) - 40,
     shadowColor: '#000',
@@ -138,4 +217,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+// const mapStateToProps = (state) => {
+//   return {
+//     LikeAddReducer: state.LikeAddReducer,
+//     SignInReducer: state.SignInReducer,
+//   };
+// };
+//
+// const mapDispatchToProps = {
+//   LikeAdd,
+// };
+//
+// CustomPost = connect(mapStateToProps, mapDispatchToProps)(CustomPost);
 export default CustomPost;
