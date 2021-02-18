@@ -104,11 +104,12 @@ class CustomPost extends Component {
         <View style={styles.postContentText}>
           <Text>{description}</Text>
         </View>
-        {imageUrl ? (
+        {imageUrl ===
+        'http://res.cloudinary.com/dvoot2rqk/image/upload/v1613686505/phodgvdqo0ftqo0tibct.png' ? null : (
           <View style={styles.postContentView}>
             <Image source={{uri: imageUrl}} style={styles.postContentImage} />
           </View>
-        ) : null}
+        )}
 
         <View style={styles.likesOrCommitView}>
           <Text>{likeCount} Beğeni</Text>
