@@ -35,17 +35,6 @@ class HomeScreen extends Component {
     this._unsubscribe = this.props.navigation.addListener('focus', async () => {
       const Aprovince = await AsyncStorage.getItem('province');
       const Acategory = await AsyncStorage.getItem('category');
-      console.log('Aprovince');
-      console.log(Aprovince);
-      console.log('Aprovince');
-      console.log('Acategory');
-      console.log(Acategory);
-      console.log('Acategory');
-      console.log('*********************************************');
-      console.log(
-        `post/filter?Category=${Acategory}&Province=${Aprovince}&District=0&Page=1&PageSize=100`,
-      );
-      console.log('*********************************************');
       if (Aprovince === null && Acategory === null) {
         await this.props.GetAllPosts();
         const {loading: l1, error: e1} = this.props.GetAllPostsReducer;

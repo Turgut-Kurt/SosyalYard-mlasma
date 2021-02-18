@@ -19,17 +19,14 @@ import moment from 'moment';
 import {connect} from 'react-redux';
 import Data from '../../data/postData';
 import {PROFIL} from '../../assets';
+import AsyncStorage from '@react-native-community/async-storage';
 class CustomPost extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
   likeFunction = async () => {
-    const {userId} = await this.props.SignInReducer;
-    console.log(userId);
-    console.log(this.props.id);
-    console.log(this.props.likeCount);
-    console.log(this.props.likeCount + 1);
+    const userId = await AsyncStorage.getItem('userId');
     let count = this.props.likeCount + 1;
     try {
       await this.props.LikeAdd(userId, this.props.id, count);
@@ -70,9 +67,6 @@ class CustomPost extends Component {
       posts,
       comments,
     } = this.props;
-    console.log('imageUrl');
-    console.log(imageUrl);
-    console.log('imageUrl');
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
