@@ -7,8 +7,6 @@ import {
   Image,
   ToastAndroid,
   Alert,
-  TextInput,
-  FlatList,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import EvilIcons from 'react-native-vector-icons/dist/EvilIcons';
@@ -17,7 +15,6 @@ import {calcHeight, calcWidth} from '../../settings/dimensions';
 import {LikeAdd} from '../../store/Actions/Like/LikeAdd';
 import moment from 'moment';
 import {connect} from 'react-redux';
-import Data from '../../data/postData';
 import {PROFIL} from '../../assets';
 import AsyncStorage from '@react-native-community/async-storage';
 class CustomPost extends Component {
@@ -25,18 +22,14 @@ class CustomPost extends Component {
     super(props);
     this.state = {};
   }
+  componentDidMount = async () => {};
   likeFunction = async () => {
-    const userId = await AsyncStorage.getItem('userId');
+    let {userId} = this.props.SignInReducer;
     let count = this.props.likeCount + 1;
     try {
       await this.props.LikeAdd(userId, this.props.id, count);
       const {data, error} = await this.props.LikeAddReducer;
-      console.log('error');
-      console.log(error);
-      console.log('error');
-      console.log('data');
-      console.log(data);
-      console.log('data');
+      this.setState({count: count});
       if (data !== null && error === null) {
         ToastAndroid.show(
           'beğendildi.',
@@ -67,6 +60,13 @@ class CustomPost extends Component {
       posts,
       comments,
     } = this.props;
+    console.log(
+      'this.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.props',
+    );
+    console.log(this.props);
+    console.log(
+      'this.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.props',
+    );
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
@@ -106,7 +106,7 @@ class CustomPost extends Component {
         )}
 
         <View style={styles.likesOrCommitView}>
-          <Text>{likeCount} Beğeni</Text>
+          <Text>{this.state.count ? this.state.count : likeCount} Beğeni</Text>
           <Text>{commentCount} Yorum</Text>
         </View>
         <View style={styles.postFooter}>
@@ -202,16 +202,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-// const mapStateToProps = (state) => {
-//   return {
-//     LikeAddReducer: state.LikeAddReducer,
-//     SignInReducer: state.SignInReducer,
-//   };
-// };
-//
-// const mapDispatchToProps = {
-//   LikeAdd,
-// };
-//
-// CustomPost = connect(mapStateToProps, mapDispatchToProps)(CustomPost);
+const mapStateToProps = (state) => {
+  return {
+    LikeAddReducer: state.LikeAddReducer,
+    SignInReducer: state.SignInReducer,
+  };
+};
+
+const mapDispatchToProps = {
+  LikeAdd,
+};
+
+CustomPost = connect(mapStateToProps, mapDispatchToProps)(CustomPost);
 export default CustomPost;
