@@ -54,6 +54,7 @@ const Router = () => (
     <RouteStack.Screen name={'RegisterScreen'} component={RegisterScreen} />
     <RouteStack.Screen name={'LoginScreen'} component={LoginScreen} />
     <RouteStack.Screen name={'BottomTabNav'} component={BottomTabNav} />
+    <RouteStack.Screen name={'CommentScreen'} component={CommentScreen} />
   </RouteStack.Navigator>
 );
 const Home = () => (

@@ -11,7 +11,9 @@ import PostAdd from './Post/PostAdd';
 import GetAllPosts from './Post/GetAllPosts';
 import LikeAdd from './Like/LikeAdd';
 import GetPostFilters from './Post/GetPostFilters';
+import PostCommentAdd from './Post/PostCommentAdd';
 export default combineReducers({
+  PostCommentAddReducer: PostCommentAdd,
   GetPostFiltersReducer: GetPostFilters,
   LikeAddReducer: LikeAdd,
   SignInReducer: SignIn,

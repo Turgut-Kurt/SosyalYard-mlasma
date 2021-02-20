@@ -10,56 +10,108 @@ import {
   FlatList,
   TextInput,
   ActivityIndicator,
+  ToastAndroid,
+  LogBox,
 } from 'react-native';
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation >state',
+]);
 import EvilIcons from 'react-native-vector-icons/dist/EvilIcons';
 import FontAwesome from 'react-native-vector-icons/dist/FontAwesome5';
 import {connect} from 'react-redux';
-import {GetAllPosts} from '../../store/Actions/Post/GetAllPosts';
+import {PostCommentAdd} from '../../store/Actions/Post/PostCommentAdd';
 import {SafeStatusView} from '../../components';
 import {calcHeight, calcWidth} from '../../settings/dimensions';
+import skeletonData from '../../data/skeletonData';
 class CommentScreen extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       value: '',
+      data: null,
+      items: [],
+      comments: [],
+      loading: false,
     };
   }
-  // componentDidMount = async () => {
-  //   this._unsubscribe = this.props.navigation.addListener('focus', async () => {
-  //     await this.props.GetAllPosts();
-  //     const {loading, error} = this.props.GetAllPostsReducer;
-  //     this.setState({
-  //       loading: loading,
-  //       errors: error,
-  //     });
-  //   });
-  // };
-  // componentWillUnmount() {
-  //   this._unsubscribe();
-  // }
+  componentDidMount = async () => {
+    const {items} = this.props.route.params;
+    const reversedItems = items.comments.reverse();
+    await this.setState({items: items, comments: reversedItems});
+    console.log('items.comments');
+    console.log(items.comments);
+    console.log('items.comments');
+    // this.setState({
+    //   loading: loading,
+    //   errors: error,
+    // });
+  };
+  addComment = async () => {
+    const {items} = this.props.route.params;
+    this.setState({loading: true});
+    let message = this.state.value;
+    let id = '';
+    console.log('items.applicationUserViewDto');
+    console.log(items.applicationUserViewDto);
+    console.log('items.applicationUserViewDto');
+    let applicationUser = items.applicationUserViewDto;
+    try {
+      let {userId} = this.props.SignInReducer;
+      await this.props.PostCommentAdd(
+        userId,
+        this.state.items.id,
+        this.state.value,
+      );
+      const {
+        loading: l1,
+        data: d1,
+        error: e1,
+      } = this.props.PostCommentAddReducer;
+      if (d1 !== null && e1 === null) {
+        id = d1;
+        let obj = Object.assign({}, {message}, {id}, {applicationUser});
+        let list = this.state.comments;
+        list.push(obj);
+        this.setState({value: '', loading: l1, comments: list});
+      }
+      if (e1) {
+        ToastAndroid.show(
+          'yorum yapılamadı.',
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+      }
+      this.setState({loading: false});
+    } catch (error) {
+      this.setState({loading: false});
+    }
+  };
   handleChange = (text) => {
     this.setState({value: text});
   };
-  renderHeader = () => {
+  renderHeader = (data) => {
     return (
       <View style={styles.modalHeader}>
         <TouchableOpacity style={styles.modalHeaderLeft}>
           <Text style={[styles.leftLikedButton, styles.extraStyle]}>
             <FontAwesome name="thumbs-up" size={20} color={'#fff'} solid />
           </Text>
-          <Text style={styles.leftLikedButton}>2</Text>
+          <Text style={styles.leftLikedButton}>
+            {data ? data.likeCount : 0}
+          </Text>
           <Text style={styles.leftLikedButton}>
             <FontAwesome name="chevron-right" size={22} color={'black'} solid />
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.modalHeaderRight}>
           <EvilIcons name="like" size={44} />
         </TouchableOpacity>
       </View>
     );
   };
-  renderItems = (loading, data, error) => {
+  renderItems = (loading, data, error, comments) => {
     if (loading) {
       return <ActivityIndicator size={40} />;
     }
@@ -68,18 +120,17 @@ class CommentScreen extends Component {
     }
     if (data) {
       if (Object.keys(data).length > 0) {
-        console.log('data');
-        console.log(data.message);
-        console.log('data');
+        console.log('items');
+        console.log(comments);
+        console.log('items');
         return (
           <View style={styles.container}>
             <FlatList
-              nestedScrollEnabled
               style={styles.flatStyle}
-              ListHeaderComponent={this.renderHeader}
+              ListHeaderComponent={this.renderHeader(data)}
               stickyHeaderIndices={[0]}
               keyExtractor={(item) => item.id.toString()}
-              data={data}
+              data={comments}
               //onEndReached={this.getMoreUsers}
               onEndReachedThreshold={0.5}
               onEndThreshold={0}
@@ -87,20 +138,25 @@ class CommentScreen extends Component {
                 console.log('item');
                 console.log(item);
                 console.log('item');
-                console.log('index');
-                console.log(index);
-                console.log('index');
                 return (
                   <View style={styles.commentStyle}>
                     <Image
-                      source={require('../../assets/denemeprofil.jpg')}
+                      source={
+                        item.applicationUser
+                          ? {
+                              uri: item.applicationUser.imageUrl,
+                            }
+                          : {
+                              uri: item.applicationUserViewDto.imageUrl,
+                            }
+                      }
                       style={styles.commentProfileStyle}
                     />
                     <View style={styles.commentViewStyle}>
                       <Text style={styles.commentNameTextStyle}>
                         {item.applicationUser
                           ? `${item.applicationUser.firstName} ${item.applicationUser.lastName}`
-                          : 'item.applicationUser null olarak geliyor'}
+                          : `${item.applicationUserViewDto.firstName} ${item.applicationUserViewDto.lastName}`}
                       </Text>
                       <Text style={styles.commentinComTextStyle}>
                         {item.message}
@@ -128,19 +184,20 @@ class CommentScreen extends Component {
             placeholderTextColor={'gray'}
             onChangeText={this.handleChange}
           />
-          <TouchableOpacity style={styles.sendCommentButton}>
-            <EvilIcons color={'#456BFF'} name="sc-telegram" size={44} />
-          </TouchableOpacity>
+          {this.state.loading ? (
+            <ActivityIndicator size="large" color="black" />
+          ) : (
+            <TouchableOpacity
+              style={styles.sendCommentButton}
+              onPress={this.addComment}>
+              <EvilIcons color={'#456BFF'} name="sc-telegram" size={44} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
   };
   render() {
-    const {data} = this.props.GetAllPostsReducer;
-    const {comments} = this.props.route.params.items;
-    console.log('items');
-    console.log(comments);
-    console.log('items');
     return (
       <SafeStatusView
         statusBackColor={'#456BFF'}
@@ -148,7 +205,12 @@ class CommentScreen extends Component {
         safeStyle={{backgroundColor: '#FFFFFF'}}
         content={
           <>
-            {this.renderItems(false, comments, null)}
+            {this.renderItems(
+              false,
+              this.state.items ? this.state.items : skeletonData,
+              null,
+              this.state.comments,
+            )}
             {this.renderFooter()}
           </>
         }
@@ -240,12 +302,13 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state) => {
   return {
-    GetAllPostsReducer: state.GetAllPostsReducer,
+    PostCommentAddReducer: state.PostCommentAddReducer,
+    SignInReducer: state.SignInReducer,
   };
 };
 
 const mapDispatchToProps = {
-  GetAllPosts,
+  PostCommentAdd,
 };
 
 CommentScreen = connect(mapStateToProps, mapDispatchToProps)(CommentScreen);

@@ -1,0 +1,33 @@
+[
+  {
+    "id": "cd1de230-43e3-4df4-86e4-ed19f16ca1d0",
+    "userId": "f9a95629-a456-4aa7-8fc9-0458e7bac79e",
+    "applicationUserViewDto": {
+      "id": "f9a95629-a456-4aa7-8fc9-0458e7bac79e",
+      "department": "Admin",
+      "email": null,
+      "phoneNumber": "01233214565",
+      "firstName": "Kuzey",
+      "lastName": "Tekinoğlu",
+      "userName": "admin",
+      "password": "000111222",
+      "imageUrl": "http://res.cloudinary.com/dvoot2rqk/image/upload/v1613705269/gppdfqr5l4fyivzvdkdy.jpg",
+      "createdAt": "2021-02-11T01:48:27.3010731",
+      "posts": null
+    },
+    "description": "turgut deneme",
+    "imageUrl": "",
+    "likeCount": 0,
+    "commentCount": 0,
+    "category": 1,
+    "province": 81,
+    "district": 0,
+    "isActive": true,
+    "createdBy": "Kuzey Tekinoğlu",
+    "modifiedBy": "Kuzey Tekinoğlu",
+    "createdAt": "2021-02-19T16:18:02.557",
+    "modifiedAt": "2021-02-19T16:18:02.56",
+    "comments": [],
+    "likes": []
+  }
+]

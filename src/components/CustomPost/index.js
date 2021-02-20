@@ -45,7 +45,10 @@ class CustomPost extends Component {
     }
   };
   gotoComment = () => {
-    NavigationService.navigate('CommentScreen', {items: this.props});
+    // NavigationService.navigate('CommentScreen', {items: this.props});
+    NavigationService.navigate('CommentScreen', {
+      items: this.props,
+    });
   };
   render() {
     const {
