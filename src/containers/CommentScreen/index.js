@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
 import {
-  SafeAreaView,
   Text,
   View,
   StyleSheet,
   TouchableOpacity,
   Image,
-  StatusBar,
   FlatList,
   TextInput,
   ActivityIndicator,
@@ -26,7 +24,6 @@ import skeletonData from '../../data/skeletonData';
 class CommentScreen extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       value: '',
       data: null,
@@ -39,22 +36,12 @@ class CommentScreen extends Component {
     const {items} = this.props.route.params;
     const reversedItems = items.comments.reverse();
     await this.setState({items: items, comments: reversedItems});
-    console.log('items.comments');
-    console.log(items.comments);
-    console.log('items.comments');
-    // this.setState({
-    //   loading: loading,
-    //   errors: error,
-    // });
   };
   addComment = async () => {
     const {items} = this.props.route.params;
     this.setState({loading: true});
     let message = this.state.value;
     let id = '';
-    console.log('items.applicationUserViewDto');
-    console.log(items.applicationUserViewDto);
-    console.log('items.applicationUserViewDto');
     let applicationUser = items.applicationUserViewDto;
     try {
       let {userId} = this.props.SignInReducer;
@@ -104,7 +91,6 @@ class CommentScreen extends Component {
             <FontAwesome name="chevron-right" size={22} color={'black'} solid />
           </Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.modalHeaderRight}>
           <EvilIcons name="like" size={44} />
         </TouchableOpacity>
@@ -120,9 +106,6 @@ class CommentScreen extends Component {
     }
     if (data) {
       if (Object.keys(data).length > 0) {
-        console.log('items');
-        console.log(comments);
-        console.log('items');
         return (
           <View style={styles.container}>
             <FlatList
@@ -131,7 +114,6 @@ class CommentScreen extends Component {
               stickyHeaderIndices={[0]}
               keyExtractor={(item) => item.id.toString()}
               data={comments}
-              //onEndReached={this.getMoreUsers}
               onEndReachedThreshold={0.5}
               onEndThreshold={0}
               renderItem={({item, index}) => {
@@ -306,10 +288,8 @@ const mapStateToProps = (state) => {
     SignInReducer: state.SignInReducer,
   };
 };
-
 const mapDispatchToProps = {
   PostCommentAdd,
 };
-
 CommentScreen = connect(mapStateToProps, mapDispatchToProps)(CommentScreen);
 export default CommentScreen;

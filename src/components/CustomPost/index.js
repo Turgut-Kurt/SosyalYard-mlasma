@@ -63,13 +63,6 @@ class CustomPost extends Component {
       posts,
       comments,
     } = this.props;
-    console.log(
-      'this.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.props',
-    );
-    console.log(this.props);
-    console.log(
-      'this.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.propsthis.props',
-    );
     return (
       <View style={styles.postView}>
         <View style={styles.postHeader}>
